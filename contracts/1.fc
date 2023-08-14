@@ -10,6 +10,7 @@ forall X -> tuple cast_to_tuple (X x) asm "NOP";
 (int) tlen (tuple t) asm "TLEN";
 forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
 
+
 (cell) find_branch_by_hash(int hash, cell tree) method_id {
   cell parent = begin_cell().end_cell();
   cell found = parent;
