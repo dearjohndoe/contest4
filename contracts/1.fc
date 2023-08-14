@@ -7,7 +7,7 @@
 -}
 
 forall X -> tuple cast_to_tuple (X x) asm "NOP";
-forall X -> cell cast_to_cell (X x) asm "NOP";
+
 (int) tlen (tuple t) asm "TLEN";
 forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
 
