@@ -14,8 +14,8 @@
 ;; testable
 (tuple) matrix_multiplier(tuple matrixA, tuple matrixB) method_id {
   int n = tlen(matrixA);
-  int m = tlen(matrixA.first(0));
-  int p = tlen(matrixB.first(0));
+  int m = tlen(matrixA.first());
+  int p = tlen(matrixB.first());
   int j = 0;
   int i = 0;
   int sum = 0;
