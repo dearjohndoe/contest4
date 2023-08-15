@@ -6,20 +6,21 @@
   this branch should be returned. Return empty cell if the branch is not found.
 -}
 
-forall X -> tuple cast_to_tuple (X x) asm "NOP";
 (int) tlen (tuple t) asm "TLEN";
-forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
 
+forall X -> (tuple, ()) push_back (tuple tail, X head) asm "CONS";
+forall X -> (tuple, (X)) pop_back (tuple t) asm "UNCONS";
+forall X, Y -> [X, Y] pair(X x, Y y) asm "PAIR";
 
 (cell) find_branch_by_hash(int hash, cell tree) method_id {
   cell parent = begin_cell().end_cell();
   cell found = parent;
 
   tuple stack = empty_tuple(); 
-  stack~tpush(cast_to_tuple([parent, tree]));
+  stack~push_back(pair(parent, tree));
   
   while (stack.tlen() > 0) {
-    tuple item = stack~tpop();
+    tuple item = stack~pop_back();
     cell s = item.at(1);
     if (s.cell_hash() == hash) {
       found = item.at(0);
@@ -27,12 +28,11 @@ forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
 
     slice s_slice = s.begin_parse();
     repeat (s_slice.slice_refs()) {
-      tuple iterItem = cast_to_tuple([s, s_slice~load_ref()]);
-      stack~tpush(iterItem);
+      stack~push_back(pair(s, s_slice~load_ref()));
     }
   }
 
-  return (found);
+  return found;
 }
 
 () recv_internal() {
