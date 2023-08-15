@@ -35,4 +35,9 @@ describe('Task5', () => {
         // the check is done inside beforeEach
         // blockchain and task5 are ready to use
     });
+    it('should fib seq', async () => {
+        const value = task5.getFibSeq(201n, 4n);
+        console.info(value);
+        expect(value);
+    });
 });

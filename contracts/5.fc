@@ -17,7 +17,41 @@
 }
 
 ;; testable
-(tuple) fibonacci_sequence (int n, int k) method_id {
-  return null();
+(tuple) fibonacci_sequence(int n, int k) method_id {
+  tuple result = empty_tuple();
+
+  if (k == 0) {
+    return result;
+  }
+
+  if (n < 2) {
+    if (n == 0) {
+      result~tpush(0);
+    }
+
+    if (k > 0) {
+      result~tpush(1);
+    }
+  }
+
+  int max = n + k;
+  int i = 2;
+  int prev = 0;
+  int current = 1;
+  int temp = 0;
+  while (i < max) {
+    if (i >= n) {
+      result~tpush(prev + current);
+    }
+
+    temp = prev;
+    prev = current;
+    current = temp + prev;
+    
+    i += 1;
+  }
+
+  ~dump(result);
+  return result;
 }
 
