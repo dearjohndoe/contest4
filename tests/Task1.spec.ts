@@ -36,7 +36,8 @@ describe('Task1', () => {
         // blockchain and task1 are ready to use
     });
     it('should find', async () => {
-        const value = await task1.getFindBranchByhash(beginCell()
+        const value = await task1.getFindBranchByhash(
+        beginCell()
             .storeUint(1,16)
             .storeRef(
                 beginCell()
@@ -45,13 +46,183 @@ describe('Task1', () => {
             )
             .storeRef(
                 beginCell()
-                    .storeUint(1332, 32)
+                    .storeCoins(1233121)
                     .storeRef(
                         beginCell()
-                            .storeUint(13732, 32)
+                            .storeUint(1,16)
                             .storeRef(
                                 beginCell()
-                                    .storeUint(2131, 32)
+                                    .storeCoins(123121)
+                                    .endCell()
+                            )
+                            .storeRef(
+                                beginCell()
+                                    .storeUint(1332, 32)
+                                    .storeRef(
+                                        beginCell()
+                                            .storeUint(13732, 32)
+                                            .storeRef(
+                                                beginCell()
+                                                    .storeUint(2131, 32)
+                                                    .endCell()
+                                            )
+                                            .storeRef(
+                                                beginCell()
+                                                .storeUint(1,16)
+                                                .storeRef(
+                                                    beginCell()
+                                                        .storeCoins(123121)
+                                                        .endCell()
+                                                )
+                                                .storeRef(
+                                                    beginCell()
+                                                        .storeUint(1332, 32)
+                                                        .storeRef(
+                                                            beginCell()
+                                                                .storeUint(13732, 32)
+                                                                .storeRef(
+                                                                    beginCell()
+                                                                        .storeUint(2131, 32)
+                                                                        .endCell()
+                                                                )
+                                                                .endCell()
+                                                        )
+                                                        .endCell()
+                                                )
+                                                .storeRef(
+                                                    beginCell()
+                                                        .storeUint(1332, 32)
+                                                        .storeRef(
+                                                            beginCell()
+                                                                .storeUint(13732, 32)
+                                                                .storeRef(
+                                                                    beginCell()
+                                                                        .storeUint(2131, 32)
+                                                                        .endCell()
+                                                                )
+                                                                .endCell()
+                                                        )
+                                                        .endCell()
+                                                )
+                                                .storeRef(
+                                                    beginCell()
+                                                        .storeUint(3732, 32)
+                                                        .storeRef(
+                                                            beginCell()
+                                                                .storeUint(21431, 32)
+                                                                .endCell()
+                                                        )
+                                                        .storeRef(
+                                                            beginCell()
+                                                                .storeUint(51431, 32)
+                                                                .endCell()
+                                                        )
+                                                        .endCell()
+                                                )
+                                                .endCell()
+                                            )
+                                            .endCell()
+                                    )
+                                    .endCell()
+                            )
+                            .storeRef(
+                                beginCell()
+                                    .storeUint(1332, 32)
+                                    .storeRef(
+                                        beginCell()
+                                            .storeUint(13732, 32)
+                                            .storeRef(
+                                                beginCell()
+                                                    .storeUint(2131, 32)
+                                                    .endCell()
+                                            )
+                                            .endCell()
+                                    )
+                                    .endCell()
+                            )
+                            .storeRef(
+                                beginCell()
+                                    .storeUint(3732, 32)
+                                    .storeRef(
+                                        beginCell()
+                                            .storeUint(21431, 32)
+                                            .endCell()
+                                    )
+                                    .storeRef(
+                                        beginCell()
+                                            .storeUint(51431, 32)
+                                            .endCell()
+                                    )
+                                    .endCell()
+                            )
+                            .endCell()
+                    )
+                    .endCell()
+            )
+            .storeRef(
+                beginCell()
+                    .storeUint(1,16)
+                    .storeRef(
+                        beginCell()
+                            .storeCoins(123121)
+                            .endCell()
+                    )
+                    .storeRef(
+                        beginCell()
+                            .storeUint(1332, 32)
+                            .storeRef(
+                                beginCell()
+                                    .storeUint(13732, 32)
+                                    .storeRef(
+                                        beginCell()
+                                            .storeUint(2131, 32)
+                                            .endCell()
+                                    )
+                                    .endCell()
+                            )
+                            .endCell()
+                    )
+                    .storeRef(
+                        beginCell()
+                            .storeUint(1332, 32)
+                            .storeRef(
+                                beginCell()
+                                    .storeUint(13732, 32)
+                                    .storeRef(
+                                        beginCell()
+                                            .storeUint(2131, 32)
+                                            .endCell()
+                                    )
+                                    .endCell()
+                            )
+                            .endCell()
+                    )
+                    .storeRef(
+                        beginCell()
+                            .storeUint(3732, 32)
+                            .storeRef(
+                                beginCell()
+                                    .storeUint(21431, 32)
+                                    .endCell()
+                            )
+                            .storeRef(
+                                beginCell()
+                                    .storeUint(37232, 32)
+                                    .storeRef(
+                                        beginCell()
+                                            .storeUint(211431, 32)
+                                            .endCell()
+                                    )
+                                    .storeRef(
+                                        beginCell()
+                                            .storeUint(514431, 32)
+                                            .endCell()
+                                    )
+                                    .endCell()
+                            )
+                            .storeRef(
+                                beginCell()
+                                    .storeUint(514431, 32)
                                     .endCell()
                             )
                             .endCell()
@@ -70,6 +241,76 @@ describe('Task1', () => {
                         beginCell()
                             .storeUint(51431, 32)
                             .endCell()
+                    )
+                    .storeRef(
+                        beginCell()
+                        .storeUint(1,16)
+                        .storeRef(
+                            beginCell()
+                                .storeCoins(123121)
+                                .endCell()
+                        )
+                        .storeRef(
+                            beginCell()
+                                .storeUint(1332, 32)
+                                .storeRef(
+                                    beginCell()
+                                        .storeUint(13732, 32)
+                                        .storeRef(
+                                            beginCell()
+                                                .storeUint(2131, 32)
+                                                .endCell()
+                                        )
+                                        .endCell()
+                                )
+                                .endCell()
+                        )
+                        .storeRef(
+                            beginCell()
+                                .storeUint(1332, 32)
+                                .storeRef(
+                                    beginCell()
+                                        .storeUint(13732, 32)
+                                        .storeRef(
+                                            beginCell()
+                                                .storeUint(2131, 32)
+                                                .endCell()
+                                        )
+                                        .endCell()
+                                )
+                                .endCell()
+                        )
+                        .storeRef(
+                            beginCell()
+                                .storeUint(3732, 32)
+                                .storeRef(
+                                    beginCell()
+                                        .storeUint(21431, 32)
+                                        .endCell()
+                                )
+                                .storeRef(
+                                    beginCell()
+                                        .storeUint(37232, 32)
+                                        .storeRef(
+                                            beginCell()
+                                                .storeUint(211431, 32)
+                                                .endCell()
+                                        )
+                                        .storeRef(
+                                            beginCell()
+                                                .storeUint(514431, 32)
+                                                .endCell()
+                                        )
+                                        .endCell()
+                                )
+                                .storeRef(
+                                    beginCell()
+                                        .storeUint(514431, 32)
+                                        .endCell()
+                                )
+                                .endCell()
+                        )
+                        .endCell()
                     )
                     .endCell()
             )
