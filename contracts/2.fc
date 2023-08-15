@@ -9,17 +9,10 @@
   After calculating the result matrix, the function should return final result (as tuple).
 -}
 
-forall X -> tuple cast_to_tuple (X x) asm "NOP";
 (int) tlen(tuple t) asm "TLEN";
 
 ;; testable
 (tuple) matrix_multiplier(tuple matrixA, tuple matrixB) method_id {
-  matrixA = cast_to_tuple([[1, 2, 3], [4, 5, 6]]);
-  matrixB = cast_to_tuple([[7, 8], [9, 10], [11, 12]]);
-
-  ~dump(matrixA);
-  ~dump(matrixB);
-  
   int n = tlen(matrixA);
   int m = tlen(matrixA.at(0));
   int p = tlen(matrixB.at(0));
@@ -46,7 +39,6 @@ forall X -> tuple cast_to_tuple (X x) asm "NOP";
     result~tpush(line);
   }
 
-  ~dump(result);
   return result;
 }
 
