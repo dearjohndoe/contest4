@@ -6,51 +6,223 @@
   character should go to the beginning. Return new text encoded in cell.
 -}
 
+forall X -> int is_null (X x) asm "ISNULL";
+
 () recv_internal() {
 }
 
-;; testable
-(cell) caesar_cipher_encrypt(int shift, cell text) method_id {
-  var result = begin_cell();
-  slice s = text.begin_parse();
-  s~load_uint(32);
-  int first_char = s~load_uint(8);
-  while (~ s.slice_empty?()) {
-    int char = s~load_uint(8);
-    char = (char + shift) % 256;
-    result~store_uint(char, 8);
+int crypt_char(int shift, int char) {
+  if (char > 64) {
+    if (char < 91) {
+      char = (char + shift) % 256;
+
+      if (char >= 91) {
+        char = 64 + char - 91 + 1;
+      }
+      if (char <= 64) {
+        char = 91 - (64 - char) - 1;
+      }
+    }
+  }
+  if (char > 96) {
+    if (char < 123) {
+      char = (char + shift) % 256;
+
+      if (char >= 123) {
+        char = 96 + char - 123 + 1;
+      }
+      if (char <= 96) {
+        char = 123 - (96 - char) - 1;
+      }
+    }
   }
 
-  result~store_uint((first_char + shift) % 256, 8);
+  return char;
+}
 
-  cell c = result.end_cell();
+(cell, int) rec_enc(int shift, int first_symbol, cell text) {
+  var encrypted = begin_cell();
+  slice sc = text.begin_parse();
+  int last_for_prev_cell = -1;
+
+  if (first_symbol == -1) {
+    sc~load_uint(32);
+    first_symbol = sc~load_uint(8);
+  } else {
+    last_for_prev_cell = sc~load_uint(8);
+  }
+
+  ;; do base encrypt
+  while (sc.slice_bits() >= 8) {
+    encrypted~store_uint(crypt_char(shift, sc~load_uint(8)), 8);
+  }
+
+  
+  ;; put first ever symbol to last cell
+  if (sc.slice_refs_empty?()) {
+    encrypted~store_uint(crypt_char(shift, first_symbol), 8);
+  } else {    ;; check tail
+    (cell tail, int first_from_tail) = rec_enc(shift, first_symbol, sc~load_ref());
+    encrypted~store_uint(crypt_char(shift, first_from_tail), 8);
+    encrypted = store_ref(encrypted, tail);
+  }
+
+  ;; debug
+  cell c = encrypted.end_cell();
+  ~strdump("enc");
+  ~dump(shift);
   ~strdump(c.begin_parse());
 
-  return c;
+  return (c, last_for_prev_cell);
+}
+
+(cell, int) rec_dec(int shift, int first_for_current, cell text) {
+  var decrypted = begin_cell();
+  slice sc = text.begin_parse();
+  if (first_for_current == -1) {
+    sc~load_uint(32);
+  }
+  
+  ;; take last
+  slice last_char = sc.slice_last(8);
+  int first_for_next = last_char~load_uint(8);
+
+  ;; rec if has
+  int last = -1;
+  if (~ sc.slice_refs_empty?()) {
+    (cell tail, last) = rec_dec(shift, first_for_next, sc~load_ref());
+    decrypted = store_ref(decrypted, tail);
+  }
+
+  ;; decrypt first
+  if (first_for_current == -1) {    ;; dec for first cell
+    decrypted~store_uint(crypt_char(shift, last), 8);
+  } else {                          ;; dec for other cells
+    decrypted~store_uint(crypt_char(shift, first_for_current), 8);
+  }
+
+  ;; for last cell should return last to begin
+  if (last == -1) {
+    last = first_for_next;
+  }
+
+  ;; decrypt others
+  while (sc.slice_bits() >= 16) {    ;; probably 8
+    decrypted~store_uint(crypt_char(shift, sc~load_uint(8)), 8);
+  }
+
+  ;; debug
+  cell c = decrypted.end_cell();
+  ~strdump("dec");
+  ~dump(shift);
+  ~strdump(c.begin_parse());
+
+  ;; return last
+  return (c, last);
+}
+
+
+;; (cell, slice) recursive_do(int shift, int is_encrypt, slice symbol, cell text) {
+;;   slice s = text.begin_parse();
+;;   if (symbol.slice_data_empty?()) {
+;;     s~load_uint(32);
+
+;;     if (is_encrypt == 0) {
+;;       shift = - shift;
+;;     } else {
+;;       symbol = begin_cell().store_uint(s~load_uint(8), 8).end_cell().begin_parse();
+;;     }
+;;   }
+
+;;   var result = begin_cell();
+;;   if (~ s.slice_data_empty?()) {
+;;     ~dump(s.slice_bits());
+;;     ~strdump(s);
+;;     while (s.slice_bits() >= 8) {
+;;       int char = (s~load_uint(8) + shift) % 256;
+;;       result~store_uint(char, 8);
+;;     }
+;;   }
+  
+;;   slice symb_ = "";
+;;   if (~ s.slice_refs_empty?()) {
+;;     (cell ref, symb_) = recursive_do(shift, is_encrypt, symbol, s~load_ref());
+;;     if (is_encrypt == -1) {
+;;       result~store_uint((symb_~load_uint(8) + shift) % 256, 8);
+;;     }
+
+;;     result = store_ref(result, ref);
+;;   } else {
+;;     if (is_encrypt == -1) {
+;;       result~store_uint((symbol~load_uint(8) + shift) % 256, 8);
+;;     }
+;;   }
+
+;;   ;; debug
+;;   cell c = result.end_cell();
+;;   ~strdump("direction");
+;;   ~dump(shift);
+;;   ~strdump(c.begin_parse());
+
+;;   return (c, is_encrypt == -1 ? symbol : "");
+;; }
+
+;; testable
+(cell) caesar_cipher_encrypt(int shift, cell text) method_id {
+  (cell e, _) = rec_enc(shift, -1, text);
+
+  return e;
 }
 
 ;; testable
 (cell) caesar_cipher_decrypt(int shift, cell text) method_id {
-  var result = begin_cell();
-  slice s = text.begin_parse();
-  s~load_uint(32);
-  while (s.slice_bits() > 8) {
-    int char = s~load_uint(8);
-    char = (char - shift) % 256;
-    result~store_uint(char, 8);
-  }
-
-  cell c = result.end_cell();
-  slice cs = c.begin_parse();
-
-  int last_char = s~load_uint(8);
-  var result2 = begin_cell();
-  result2~store_uint((last_char - shift) % 256, 8);
-  int bits = cs.slice_bits();
-  result2~store_uint(cs~load_uint(bits), bits);
-
-  cell final = result2.end_cell();
-  ~strdump(final.begin_parse());
-
-  return final;
+  shift = - shift;
+  (cell e, _) = rec_dec(shift, -1, text);
+  
+  return e;
 }
+
+;; (cell) caesar_cipher_encrypt(int shift, cell text) method_id {
+;;   var result = begin_cell();
+;;   slice s = text.begin_parse();
+;;   s~load_uint(32);
+;;   int first_char = s~load_uint(8);
+;;   while (~ s.slice_empty?()) {
+;;     int char = s~load_uint(8);
+;;     char = (char + shift) % 256;
+;;     result~store_uint(char, 8);
+;;   }
+
+;;   result~store_uint((first_char + shift) % 256, 8);
+
+;;   cell c = result.end_cell();
+;;   ~strdump(c.begin_parse());
+
+;;   return c;
+;; }
+
+;; ;; testable
+;; (cell) caesar_cipher_decrypt(int shift, cell text) method_id {
+;;   var result = begin_cell();
+;;   slice s = text.begin_parse();
+;;   s~load_uint(32);
+;;   while (s.slice_bits() > 8) {
+;;     int char = s~load_uint(8);
+;;     char = (char - shift) % 256;
+;;     result~store_uint(char, 8);
+;;   }
+
+;;   cell c = result.end_cell();
+;;   slice cs = c.begin_parse();
+
+;;   int last_char = s~load_uint(8);
+;;   var result2 = begin_cell();
+;;   result2~store_uint((last_char - shift) % 256, 8);
+;;   int bits = cs.slice_bits();
+;;   result2~store_uint(cs~load_uint(bits), bits);
+
+;;   cell final = result2.end_cell();
+;;   ~strdump(final.begin_parse());
+
+;;   return final;
+;; }
