@@ -11,11 +11,28 @@
 
 ;; testable
 (cell) caesar_cipher_encrypt(int shift, cell text) method_id {
-  return begin_cell().end_cell();
+  var result = begin_cell();
+  slice s = text.begin_parse();
+  while (~ s.slice_empty?()) {
+    result~store_uint(s~load_uint(8) + shift, 8);
+  }
+
+  cell c = result.end_cell();
+  ~strdump(c.begin_parse());
+
+  return c;
 }
 
 ;; testable
 (cell) caesar_cipher_decrypt(int shift, cell text) method_id {
-  return begin_cell().end_cell();
-}
+  var result = begin_cell();
+  slice s = text.begin_parse();
+  while (~ s.slice_empty?()) {
+    result~store_uint(s~load_uint(8) - shift, 8);
+  }
 
+  cell c = result.end_cell();
+  ~strdump(c.begin_parse());
+
+  return c;
+}
