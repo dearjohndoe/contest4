@@ -36,15 +36,15 @@ describe('Task4', () => {
         // blockchain and task4 are ready to use
     });
     it('should encrypt', async () => {
-        const originalString = "qweasdzxc rtyfghvbn"
-                         //    "qweasdzxc rtyfghvbn"
+        const originalString = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                         //    "EFGHIJKLMNOPQRSTUVWXYZABCD"
         const original = beginCell()
             .storeUint(0, 32)
             .storeStringTail(originalString)
             .storeRef(
                 beginCell()
-                    .storeStringTail("uiojkm p123?:@!(*){}")
-                        //           "uiojkm p123?:@!(*){}"
+                    .storeStringTail("abcdefghijklmnopqrstuvwxyz")
+                        //           "efghijklmnopqrstuvwxyzabcd"
                     .endCell()
             )
             .endCell();
@@ -54,10 +54,10 @@ describe('Task4', () => {
         }
         const decrypted = await task4.getDecrypt(4n, beginCell()
             .storeUint(0, 32)
-            .storeStringTail("aiewhdbg vxcjklzfry")
+            .storeStringTail("EFGHIJKLMNOPQRSTUVWXYZABCD")
             .storeRef(
                 beginCell()
-                    .storeStringTail("msnoq t123?:@!(*){}u")
+                    .storeStringTail("efghijklmnopqrstuvwxyzabcd")
                     .endCell()
             )
             .endCell());
