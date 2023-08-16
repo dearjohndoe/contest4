@@ -36,14 +36,20 @@ describe('Task4', () => {
         // blockchain and task4 are ready to use
     });
     it('should encrypt', async () => {
+        const originalString = "hello world"
         const original = beginCell()
-            .storeStringTail("hello world")
+            .storeUint(0, 32)
+            .storeStringTail(originalString)
             .endCell();
         const encrypted = await task4.getEncrypt(4n, original);
         if (!encrypted) {
             throw new Error('Encryption failed');
         }
-        const decrypted = await task4.getDecrypt(4n, encrypted);
-        expect(decrypted.beginParse().loadStringTail()).toEqual(original.beginParse().loadStringTail());
+        const encryptedString = encrypted.beginParse().loadStringTail();
+        const decrypted = await task4.getDecrypt(4n, beginCell()
+            .storeUint(0, 32)
+            .storeStringTail(encryptedString)
+            .endCell());
+        expect(decrypted.beginParse().loadStringTail()).toEqual(originalString);
     });
 });
