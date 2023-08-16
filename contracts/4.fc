@@ -59,12 +59,12 @@ cell rec_enc(int shift, int first_symbol, cell text) {
   }
 
   ;; debug
-  cell c = encrypted.end_cell();
-  ~strdump("enc");
-  ~dump(shift);
-  ~strdump(c.begin_parse());
+  ;; cell c = encrypted.end_cell();
+  ;; ~strdump("enc");
+  ;; ~dump(shift);
+  ;; ~strdump(c.begin_parse());
 
-  return c;
+  return encrypted.end_cell();
 }
 
 cell rec_dec(int shift, int first_for_current, cell text) {
@@ -83,17 +83,17 @@ cell rec_dec(int shift, int first_for_current, cell text) {
   }
 
   ;; dec
-  while (sc.slice_bits() >= 8) {    ;; probably 8
+  while (sc.slice_bits() >= 8) {
     decrypted~store_uint(crypt_char(shift, sc~load_uint(8)), 8);
   }
 
   ;; debug
-  cell c = decrypted.end_cell();
-  ~strdump("dec");
-  ~dump(shift);
-  ~strdump(c.begin_parse());
+  ;; cell c = decrypted.end_cell();
+  ;; ~strdump("dec");
+  ;; ~dump(shift);
+  ;; ~strdump(c.begin_parse());
 
-  return c;
+  return decrypted.end_cell();
 }
 
 ;; testable
