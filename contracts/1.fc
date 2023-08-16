@@ -18,7 +18,7 @@ forall X, Y -> [X, Y] pair(X x, Y y) asm "PAIR";
   repeat (s.slice_refs()) {
     cell child = s~load_ref();
     if (child.cell_hash() == hash) {
-      return (root1, -1);
+      return (child, -1);
     }
 
     (cell found_root, int found) = recursive_find(hash, child);
