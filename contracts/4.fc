@@ -14,7 +14,9 @@
   var result = begin_cell();
   slice s = text.begin_parse();
   while (~ s.slice_empty?()) {
-    result~store_uint(s~load_uint(8) + shift, 8);
+    int char = s~load_uint(8);
+    char = (char + shift) % 256;
+    result~store_uint(char, 8);
   }
 
   cell c = result.end_cell();
@@ -28,7 +30,9 @@
   var result = begin_cell();
   slice s = text.begin_parse();
   while (~ s.slice_empty?()) {
-    result~store_uint(s~load_uint(8) - shift, 8);
+    int char = s~load_uint(8);
+    char = (char - shift) % 256;
+    result~store_uint(char, 8);
   }
 
   cell c = result.end_cell();
