@@ -58,12 +58,6 @@ cell rec_enc(int shift, int first_symbol, cell text) {
     encrypted = store_ref(encrypted, tail);
   }
 
-  ;; debug
-  cell c = encrypted.end_cell();
-  ~strdump("enc");
-  ~dump(shift);
-  ~strdump(c.begin_parse());
-
   return encrypted.end_cell();
 }
 
@@ -87,12 +81,6 @@ cell rec_dec(int shift, int first_for_current, cell text) {
     decrypted~store_uint(crypt_char(shift, sc~load_uint(8)), 8);
   }
 
-  ;; debug
-  cell c = decrypted.end_cell();
-  ~strdump("dec");
-  ~dump(shift);
-  ~strdump(c.begin_parse());
-
   return decrypted.end_cell();
 }
 
@@ -103,6 +91,5 @@ cell rec_dec(int shift, int first_for_current, cell text) {
 
 ;; testable
 (cell) caesar_cipher_decrypt(int shift, cell text) method_id {
-  shift = - shift;
-  return rec_dec(shift % 26, -1, text);
+  return rec_dec(shift * -1 % 26, -1, text);
 }
