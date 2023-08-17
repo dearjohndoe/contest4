@@ -59,10 +59,10 @@ cell rec_enc(int shift, int first_symbol, cell text) {
   }
 
   ;; debug
-  ;; cell c = encrypted.end_cell();
-  ;; ~strdump("enc");
-  ;; ~dump(shift);
-  ;; ~strdump(c.begin_parse());
+  cell c = encrypted.end_cell();
+  ~strdump("enc");
+  ~dump(shift);
+  ~strdump(c.begin_parse());
 
   return encrypted.end_cell();
 }
@@ -88,21 +88,21 @@ cell rec_dec(int shift, int first_for_current, cell text) {
   }
 
   ;; debug
-  ;; cell c = decrypted.end_cell();
-  ;; ~strdump("dec");
-  ;; ~dump(shift);
-  ;; ~strdump(c.begin_parse());
+  cell c = decrypted.end_cell();
+  ~strdump("dec");
+  ~dump(shift);
+  ~strdump(c.begin_parse());
 
   return decrypted.end_cell();
 }
 
 ;; testable
 (cell) caesar_cipher_encrypt(int shift, cell text) method_id {
-  return rec_enc(shift, -1, text);
+  return rec_enc(shift % 26, -1, text);
 }
 
 ;; testable
 (cell) caesar_cipher_decrypt(int shift, cell text) method_id {
   shift = - shift;
-  return rec_dec(shift, -1, text);
+  return rec_dec(shift % 26, -1, text);
 }
