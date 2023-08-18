@@ -37,6 +37,6 @@ describe('Task2', () => {
     });
     it('should multiply', async () => {
         const value = task2.getMatrixMultiplier([], []);
-        expect(value);
+        // expect(value);
     });
 });

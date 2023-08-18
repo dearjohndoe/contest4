@@ -14,29 +14,32 @@
 ;; testable
 (tuple) matrix_multiplier(tuple matrixA, tuple matrixB) method_id {
   int n = tlen(matrixA);
-  int m = tlen(matrixA.first());
-  int p = tlen(matrixB.first());
+  tuple matrixAAtI = matrixA.first();
+  int m = tlen(matrixAAtI);
+  int p = tlen(matrixAAtI);
   int j = 0;
   int i = 0;
   int sum = 0;
   int k = 0;
   tuple result = empty_tuple();
+  tuple line = empty_tuple();
   while (i < n) {
     j = 0;
-    tuple line = empty_tuple();
     while (j < p) {
       k = 0;
       sum = 0;
       while (k < m) {
-        sum = sum + matrixA.at(i).at(k) * matrixB.at(k).at(j);
+        sum = sum + matrixAAtI.at(k) * matrixB.at(k).at(j);
         k += 1;
       }
       line~tpush(sum);
       j += 1;
     }
     i += 1;
+    matrixAAtI = matrixA.at(i);
 
     result~tpush(line);
+    line = empty_tuple();
   }
 
   return result;
