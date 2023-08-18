@@ -15,8 +15,7 @@ forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
 ;; testable
 (tuple) matrix_multiplier(tuple matrixA, tuple matrixB) method_id {
   int n = tlen(matrixA);
-  tuple matrixAAtI = matrixA.first();
-  int m = tlen(matrixAAtI);
+  int m = tlen(matrixA.first());
   int p = tlen(matrixB.first());
   int j = 0;
   int i = 0;
@@ -24,7 +23,9 @@ forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
   int k = 0;
   tuple result = empty_tuple();
   tuple line = empty_tuple();
+  tuple matrixAAtI = empty_tuple();
   while (i < n) {
+    matrixAAtI = matrixA.at(i);
     j = 0;
     while (j < p) {
       k = 0;
@@ -37,7 +38,6 @@ forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
       j += 1;
     }
     i += 1;
-    matrixAAtI = matrixA.at(i);
 
     result~tpush(line);
     line = empty_tuple();
