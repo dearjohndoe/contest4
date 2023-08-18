@@ -9,33 +9,15 @@
 () recv_internal() {
 }
 
-int crypt_char(int shift, int char) {
-  if (char > 64) {
-    if (char < 91) {
-      char = (char + shift) % 256;
-
-      if (char >= 91) {
-        char = 64 + char - 91 + 1;
-      }
-      if (char <= 64) {
-        char = 91 - (64 - char) - 1;
-      }
-    }
+int crypt_char(int s, int c) {
+  if ((c >= 65) & (c <= 90)) {
+    return 65 + (c - 65 + s) % 26;
   }
-  if (char > 96) {
-    if (char < 123) {
-      char = (char + shift) % 256;
-
-      if (char >= 123) {
-        char = 96 + char - 123 + 1;
-      }
-      if (char <= 96) {
-        char = 123 - (96 - char) - 1;
-      }
-    }
+  if ((c >= 97) & (c <= 122)) {
+    return 97 + (c - 97 + s) % 26;
   }
 
-  return char;
+  return c;
 }
 
 cell rec_enc(int shift, int first_symbol, cell text) {
