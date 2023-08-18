@@ -20,7 +20,7 @@ int crypt_char(int s, int c) {
   return c;
 }
 
-cell rec_enc(int shift, int first_symbol, cell text) {
+cell do_ceasar(int shift, int first_symbol, cell text) {
   var encrypted = begin_cell();
   slice sc = text.begin_parse();
 
@@ -36,42 +36,19 @@ cell rec_enc(int shift, int first_symbol, cell text) {
 
   ;; check tail
   if (~ sc.slice_refs_empty?()) {
-    cell tail = rec_enc(shift, 0, sc~load_ref());
+    cell tail = do_ceasar(shift, 0, sc~load_ref());
     encrypted = store_ref(encrypted, tail);
   }
 
   return encrypted.end_cell();
 }
 
-cell rec_dec(int shift, int first_for_current, cell text) {
-  var decrypted = begin_cell();
-
-  slice sc = text.begin_parse();
-  if (first_for_current == -1) {
-    sc~load_uint(32);
-    decrypted~store_uint(0, 32);
-  }
-  
-  ;; rec if has
-  if (~ sc.slice_refs_empty?()) {
-    cell tail = rec_dec(shift, 0, sc~load_ref());
-    decrypted = store_ref(decrypted, tail);
-  }
-
-  ;; dec
-  while (sc.slice_bits() >= 8) {
-    decrypted~store_uint(crypt_char(shift, sc~load_uint(8)), 8);
-  }
-
-  return decrypted.end_cell();
-}
-
 ;; testable
 (cell) caesar_cipher_encrypt(int shift, cell text) method_id {
-  return rec_enc(shift % 26, -1, text);
+  return do_ceasar(shift % 26, -1, text);
 }
 
 ;; testable
 (cell) caesar_cipher_decrypt(int shift, cell text) method_id {
-  return rec_dec(shift * -1 % 26, -1, text);
+  return do_ceasar(shift * -1 % 26, -1, text);
 }
