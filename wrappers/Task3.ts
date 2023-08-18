@@ -1,4 +1,4 @@
-import { Address, beginCell, Cell, Contract, contractAddress, ContractProvider, Sender, SendMode } from 'ton-core';
+import { Address, beginCell, Cell, Contract, contractAddress, ContractProvider, Sender, SendMode, TupleItemCell, TupleItemInt } from 'ton-core';
 
 export type Task3Config = {};
 
@@ -25,5 +25,13 @@ export class Task3 implements Contract {
             sendMode: SendMode.PAY_GAS_SEPARATELY,
             body: beginCell().endCell(),
         });
+    }
+
+    async getFindSubstring(provider: ContractProvider, flag: bigint, value: bigint, linked_list: Cell) {
+        const f:    TupleItemInt = { type: "int", value: flag };
+        const v:    TupleItemInt = { type: "int", value: value };
+        const list: TupleItemCell = { type: "cell", cell: linked_list };
+        const { stack } = await provider.get("find_and_replace", [f, v, list]);
+        return stack.readCell();
     }
 }

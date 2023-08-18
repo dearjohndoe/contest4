@@ -1,5 +1,5 @@
 import { Blockchain, SandboxContract } from '@ton-community/sandbox';
-import { Cell, toNano } from 'ton-core';
+import { BitString, Cell, beginCell, toNano } from 'ton-core';
 import { Task3 } from '../wrappers/Task3';
 import '@ton-community/test-utils';
 import { compile } from '@ton-community/blueprint';
@@ -34,5 +34,15 @@ describe('Task3', () => {
     it('should deploy', async () => {
         // the check is done inside beforeEach
         // blockchain and task3 are ready to use
+    });
+    it('should find', async () => {
+        var b = Buffer.from("helloo world", "ascii");
+        var bs = new BitString(b, 0, b.length);
+
+        const snikeBits = beginCell()
+        .storeBits(bs)
+        .endCell();
+        const value = task3.getFindSubstring(3214n, 3333n, snikeBits);
+        expect(value);
     });
 });
