@@ -36,13 +36,52 @@ describe('Task3', () => {
         // blockchain and task3 are ready to use
     });
     it('should find', async () => {
-        var b = Buffer.from("helloo world", "ascii");
-        var bs = new BitString(b, 0, b.length);
-
         const snikeBits = beginCell()
-        .storeBits(bs)
-        .endCell();
-        const value = task3.getFindSubstring(3214n, 3333n, snikeBits);
-        expect(value);
+            .storeUint(1n, 250)
+            .storeUint(1n, 250)
+            .storeUint(1n, 250)
+            .storeUint(1n, 250)
+            .storeUint(1n, 23)
+            .storeRef(
+                beginCell()
+                .storeUint(1n, 250)
+                .storeUint(1n, 250)
+            )
+            .endCell();
+        const expected = beginCell()
+            .storeUint(2n, 250)
+            .storeUint(2n, 250)
+            .storeUint(2n, 250)
+            .storeUint(2n, 250)
+            .storeUint(2n, 23)
+            .storeRef(
+                beginCell()
+                .storeUint(2n, 250)
+                .storeUint(2n, 250)
+            )
+            .endCell();
+        const value = await task3.getFindSubstring(1024n, 1023n, snikeBits);
+        console.log("got:");
+        console.log(printCellBinary(value, 0));
+        console.log("expected:");
+        console.log(printCellBinary(expected, 0));
     });
 });
+
+function printCellBinary(cell: Cell, level: number): string {
+    var sc = cell.beginParse();
+
+    var output = `cell: ${level}\n`;
+    while (sc.remainingBits > 0) {
+        const bits = sc.loadUint(1);
+        output += bits.toString(2);
+    }
+    output += "\n";
+
+    if (sc.remainingRefs) {
+        const ref = sc.loadRef();
+        output += printCellBinary(ref, level + 1);
+    }
+
+    return output;
+}

@@ -31,9 +31,9 @@
 -}
 
 int min(int x, int y) asm "MIN";
-(int) ubitsize (int a) asm "UBITSIZE";
+(int) ubitsize(int a) asm "UBITSIZE";
 
-(int) tlen (tuple t) asm "TLEN";
+(int) tlen(tuple t) asm "TLEN";
 
 int cell_null?(cell c) asm "ISNULL";
 
@@ -51,22 +51,29 @@ slice int_to_slice(int bits, int size) {
   return c.begin_parse();
 }
 
-(var, (int)) write_bits(var out, slice v, int s) {
+(var) create_new_cell(slice v, int s) {
+
+}
+
+(builder, (builder, int)) write_bits(builder out, slice v, int s) {
   int limit = 1023 - out.builder_bits();
   if (s < limit) {
     out~store_uint(v~load_uint(v.slice_bits()), s);
 
-    return (out, 0);
+    return (out, (null(), 0));
   }
 
   out~store_uint(v~load_uint(limit), limit);
 
-  var next_cell = begin_cell()
-    .store_uint(v~load_uint(v.slice_bits()), s - limit);
-    
-  ;; out = store_ref(out, next_cell);
+  builder next_cell = begin_cell();
+  if (s > limit) {
+    ~strdump("new write");
+    ~dump(s);
+    ~dump(s - limit);
+    next_cell~store_uint(v~load_uint(v.slice_bits()), s - limit);
+  }
 
-  return (next_cell, -1);
+  return (out, (next_cell, -1));
 }
 
 ;; use const for preload
@@ -147,34 +154,36 @@ slice int_to_slice(int bits, int size) {
     (_, (int bits, int len)) = preload(sc, flen);
 
     if (len > 0) {
-      out_stack~push_back(out);
-
-      int new_cell = 0;
+      builder new_out = null();
+      int has_new = 0;
       if (bits == flag) {
         (int bits, _) = sc~preload(flen);
-        new_cell = out~write_bits(int_to_slice(value, vlen), vlen);
+        (new_out, has_new) = out~write_bits(int_to_slice(value, vlen), vlen);
+
         ;; ~strdump("==");
         ;; ~dump(bits);
         ;; ~dump(out);
       } else {
         (int bits, _) = sc~preload(1);
-        new_cell = out~write_bits(int_to_slice(bits, 1), 1);
+        (new_out, has_new) = out~write_bits(int_to_slice(bits, 1), 1);
         ;; ~strdump("!!");
         ;; ~dump(bits);
         ;; ~dump(out);
       }
 
-      ;; stack current call and load next
-      if (~ new_cell) {
-        out_stack~pop_back();
+      if (has_new) {
+        out_stack~push_back(out);
+        out = new_out;
       }
     }
   }
 
-  ;; ~dump(out_stack);
   ;; take root cell from stack
-  while (out_stack.tlen() > 1) {
-    out_stack~pop_back();
+
+  while (out_stack.tlen() > 0) {
+    builder top = out_stack~pop_back();
+    top = store_ref(top, out.end_cell());
+    out = top;
   }
 
   if (out_stack.tlen() == 0) {
