@@ -61,6 +61,6 @@ describe('Task4', () => {
                     .endCell()
             )
             .endCell());
-        // expect(decrypted.beginParse().loadStringTail()).toEqual(originalString);
+        expect(decrypted.hash()).toEqual(original.hash());
     });
 });

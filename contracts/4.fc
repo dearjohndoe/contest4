@@ -6,17 +6,18 @@
   character should go to the beginning. Return new text encoded in cell.
 -}
 
-global int Shift;
+global int UpperShift;
+global int LowerShift;
 
 () recv_internal() {
 }
 
 int crypt_char(int c) {
   if ((c >= 65) & (c <= 90)) {
-    return 65 + (c - 65 + Shift) % 26;
+    return 65 + (c - UpperShift) % 26;
   }
   if ((c >= 97) & (c <= 122)) {
-    return 97 + (c - 97 + Shift) % 26;
+    return 97 + (c - LowerShift) % 26;
   }
 
   return c;
@@ -45,12 +46,14 @@ cell do_ceasar(int first_symbol, cell text) {
 
 ;; testable
 (cell) caesar_cipher_encrypt(int shift, cell text) method_id {
-  Shift = shift % 26;
+  UpperShift = 65 - shift % 26;
+  LowerShift = 97 - shift % 26;
   return do_ceasar(-1, text);
 }
 
 ;; testable
 (cell) caesar_cipher_decrypt(int shift, cell text) method_id {
-  Shift = shift * -1 % 26;
+  UpperShift = 65 + shift % 26;
+  LowerShift = 97 + shift % 26;
   return do_ceasar(-1, text);
 }
