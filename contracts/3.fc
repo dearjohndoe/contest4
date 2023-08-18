@@ -106,21 +106,19 @@ forall X -> (tuple, (X)) pop_back(tuple t) asm "UNCONS";
   while (~ sc.slice_empty?()) {
     (_, (int bits, int len)) = preload(sc, flen);
 
-    if (len > 0) {
-      builder new_out = null();
-      int has_new = 0;
-      if (bits == flag) {
-        (int bits, _) = sc~preload(flen);
-        (new_out, has_new) = out~write_bits(value, vlen);
-      } else {
-        (int bits, _) = sc~preload(1);
-        (new_out, has_new) = out~write_bits(bits, 1);
-      }
+    builder new_out = null();
+    int has_new = 0;
+    if (bits == flag) {
+      (int bits, _) = sc~preload(flen);
+      (new_out, has_new) = out~write_bits(value, vlen);
+    } else {
+      (int bits, _) = sc~preload(1);
+      (new_out, has_new) = out~write_bits(bits, 1);
+    }
 
-      if (has_new) {
-        out_stack~push_back(out);
-        out = new_out;
-      }
+    if (has_new) {
+      out_stack~push_back(out);
+      out = new_out;
     }
   }
 
@@ -130,10 +128,6 @@ forall X -> (tuple, (X)) pop_back(tuple t) asm "UNCONS";
     out = top;
   }
 
-  if (out_stack.tlen() == 0) {
-    return out.end_cell();
-  }
-
-  return out_stack~pop_back().end_cell();
+  return out.end_cell();
 }
 
