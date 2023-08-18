@@ -59,7 +59,7 @@ forall X -> (tuple, (X)) pop_back(tuple t) asm "UNCONS";
   return (out, (next_cell, -1));
 }
 
-(slice, (int, int)) preload(slice sc, int read) {
+(slice, (int)) preload(slice sc, int read) {
   int left_bits = sc.slice_bits();
 
   ;; switch to next ref
@@ -74,21 +74,22 @@ forall X -> (tuple, (X)) pop_back(tuple t) asm "UNCONS";
   if (left_bits < read) {
     ;; no cells anymore
     if (sc.slice_refs_empty?()) {
-      return (sc, (bits, read_bits));
+      return (sc, (bits));
     }
 
     ;; load tail
     sc = sc~load_ref().begin_parse();
-    (int tail, int tail_len) = sc~preload(read - read_bits);
+    int tail_len = read - read_bits;
+    int tail = sc~preload(tail_len);
 
-    if (tail_len != -1) {
-      bits = bits << tail_len;
-      bits += tail;
-      read_bits += tail_len;
-    }
+    ~dump(0);
+    ~dump(tail_len);
+    bits = bits << tail_len;
+    bits += tail;
+    read_bits += tail_len;
   }
 
-  return (sc, (bits, read_bits));
+  return (sc, (bits));
 }
 
 ;; testable
@@ -101,7 +102,7 @@ forall X -> (tuple, (X)) pop_back(tuple t) asm "UNCONS";
   slice sc = linked_list.begin_parse();
   
   while (~ sc.slice_empty?()) {
-    (_, (int bits, _)) = preload(sc, flen);
+    (_, (int bits)) = preload(sc, flen);
 
     builder new_out = null();
     int has_new = 0;
@@ -109,7 +110,7 @@ forall X -> (tuple, (X)) pop_back(tuple t) asm "UNCONS";
       sc~preload(flen);
       (new_out, has_new) = out~write_bits(value, vlen);
     } else {
-      (bits, _) = sc~preload(1);
+      bits = sc~preload(1);
       (new_out, has_new) = out~write_bits(bits, 1);
     }
 
