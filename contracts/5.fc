@@ -19,38 +19,48 @@
 ;; testable
 (tuple) fibonacci_sequence(int n, int k) method_id {
   tuple result = empty_tuple();
-
   if (k == 0) {
     return result;
   }
 
-  if (n < 2) {
-    if (n == 0) {
-      result~tpush(0);
+  if (n == 0) {
+    result~tpush(0);
+    k -= 1;
+    if (k == 0) {
+      return result;
     }
-
-    if (k > 0) {
-      result~tpush(1);
+  }
+  if (n < 2) {
+    result~tpush(1);
+    k -= 1;
+    if (k == 0) {
+      return result;
     }
   }
 
-  int max = n + k;
-  int i = 2;
+  ;; compute first element
   int prev = 0;
   int current = 1;
   int temp = 0;
-  while (i < max) {
-    if (i >= n) {
-      result~tpush(prev + current);
-    }
-
+  int i = 2;
+  while (i < n) {
     temp = prev;
     prev = current;
     current = temp + prev;
-    
+
     i += 1;
   }
 
+  ;; push k elements
+  while (k > 0) {
+    temp = prev;
+    prev = current;
+    current = temp + prev;
+    result~tpush(current);
+
+    k -= 1;
+  }
+  
   return result;
 }
 
