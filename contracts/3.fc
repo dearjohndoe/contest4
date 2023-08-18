@@ -30,6 +30,8 @@
 
 -}
 
+global int FLen;
+
 int min(int x, int y) asm "MIN";
 (int) ubitsize(int a) asm "UBITSIZE";
 
@@ -59,7 +61,7 @@ forall X -> (tuple, (X)) pop_back(tuple t) asm "UNCONS";
   return (out, (next_cell));
 }
 
-int preload(slice sc, int read) inline {
+int preload(slice sc) inline {
   int left_bits = sc.slice_bits();
 
   ;; switch to next ref
@@ -68,9 +70,9 @@ int preload(slice sc, int read) inline {
     left_bits = sc.slice_bits();
   }
 
-  int read_bits = min(left_bits, read);
+  int read_bits = min(left_bits, FLen);
   int bits = sc~load_uint(read_bits);
-  if (left_bits < read) {
+  if (left_bits < FLen) {
     ;; no cells anymore
     if (sc.slice_refs_empty?()) {
       return bits;
@@ -78,7 +80,7 @@ int preload(slice sc, int read) inline {
 
     ;; load tail
     sc = sc~load_ref().begin_parse();
-    int tail_len = read - read_bits;
+    int tail_len = FLen - read_bits;
     int tail = sc~load_uint(min(tail_len, sc.slice_bits()));
 
     bits = (bits << tail_len) + tail;
@@ -118,19 +120,20 @@ int preload(slice sc, int read) inline {
 
 ;; testable
 (cell) find_and_replace(int flag, int value, cell linked_list) method_id {
-  int flen = ubitsize(flag);
+  FLen = ubitsize(flag);
   int vlen = ubitsize(value);
 
   tuple out_stack = empty_tuple();
   var out = begin_cell();
   slice sc = linked_list.begin_parse();
-  
+  int bits = 0;
+
   while (~ sc.slice_empty?()) {
-    int bits = preload(sc, flen);
+    bits = preload(sc);
 
     builder new_out = null();
     if (bits == flag) {
-      sc~load(flen);
+      sc~load(FLen);
       new_out = out~write_bits(value, vlen);
     } else {
       bits = sc~load(1);
