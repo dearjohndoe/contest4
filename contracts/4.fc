@@ -6,62 +6,53 @@
   character should go to the beginning. Return new text encoded in cell.
 -}
 
-(int) tlen(tuple t) asm "TLEN";
-forall X -> (tuple, ()) push_back(tuple tail, X head) asm "CONS";
-forall X -> (tuple, (X)) pop_back(tuple t) asm "UNCONS";
+global int Shift;
 
-int crypt_char(int s, int c) inline {
+() recv_internal() {
+}
+
+int crypt_char(int c) {
   if ((c >= 65) & (c <= 90)) {
-    return 65 + (c - 65 + s) % 26;
+    return 65 + (c - 65 + Shift) % 26;
   }
   if ((c >= 97) & (c <= 122)) {
-    return 97 + (c - 97 + s) % 26;
+    return 97 + (c - 97 + Shift) % 26;
   }
 
   return c;
 }
 
-cell do_ceasar(int shift, int first_symbol, cell text) {
-  tuple out_stack = empty_tuple();
-  builder out = begin_cell();
+cell do_ceasar(int first_symbol, cell text) {
+  var encrypted = begin_cell();
   slice sc = text.begin_parse();
 
   if (first_symbol == -1) {
     sc~load_uint(32);
-    out~store_uint(0, 32);
+    encrypted~store_uint(0, 32);
   }
 
-  while (~ sc.slice_empty?()) {
-    ;; do base encrypt
-    while (sc.slice_bits() >= 8) {
-      out~store_uint(crypt_char(shift, sc~load_uint(8)), 8);
-    }
-
-    ;; check tail
-    if (~ sc.slice_refs_empty?()) {
-      out_stack~push_back(out);
-      sc = sc~load_ref().begin_parse();
-    }
+  ;; do base encrypt
+  while (~ sc.slice_data_empty?()) {
+    encrypted~store_uint(crypt_char(sc~load_uint(8)), 8);
   }
 
-  while (out_stack.tlen() > 0) {
-    builder top = out_stack~pop_back();
-    top = store_ref(top, out.end_cell());
-    out = top;
+  ;; check tail
+  if (~ sc.slice_refs_empty?()) {
+    cell tail = do_ceasar(0, sc~load_ref());
+    encrypted = store_ref(encrypted, tail);
   }
 
-  return out.end_cell();
-}
-
-() recv_internal() {
+  return encrypted.end_cell();
 }
 
 ;; testable
 (cell) caesar_cipher_encrypt(int shift, cell text) method_id {
-  return do_ceasar(shift % 26, -1, text);
+  Shift = shift % 26;
+  return do_ceasar(-1, text);
 }
 
 ;; testable
 (cell) caesar_cipher_decrypt(int shift, cell text) method_id {
-  return do_ceasar(shift * -1 % 26, -1, text);
+  Shift = shift * -1 % 26;
+  return do_ceasar(-1, text);
 }
