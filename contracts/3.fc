@@ -35,8 +35,6 @@ int min(int x, int y) asm "MIN";
 
 (int) tlen(tuple t) asm "TLEN";
 
-int cell_null?(cell c) asm "ISNULL";
-
 forall X -> (tuple, ()) push_back(tuple tail, X head) asm "CONS";
 forall X -> (tuple, (X)) pop_back(tuple t) asm "UNCONS";
 
@@ -44,15 +42,10 @@ forall X -> (tuple, (X)) pop_back(tuple t) asm "UNCONS";
 }
 
 slice int_to_slice(int bits, int size) {
-  cell c = begin_cell()
+  return begin_cell()
     .store_uint(bits, size)
-    .end_cell();
-
-  return c.begin_parse();
-}
-
-(var) create_new_cell(slice v, int s) {
-
+    .end_cell()
+    .begin_parse();
 }
 
 (builder, (builder, int)) write_bits(builder out, slice v, int s) {
@@ -67,9 +60,6 @@ slice int_to_slice(int bits, int size) {
 
   builder next_cell = begin_cell();
   if (s > limit) {
-    ~strdump("new write");
-    ~dump(s);
-    ~dump(s - limit);
     next_cell~store_uint(v~load_uint(v.slice_bits()), s - limit);
   }
 
@@ -128,18 +118,6 @@ slice int_to_slice(int bits, int size) {
 
 ;; testable
 (cell) find_and_replace(int flag, int value, cell linked_list) method_id {
-  ;; flag = 4;
-  ;; value = 7;
-  ;; linked_list = begin_cell()
-  ;;   .store_uint(2, 8)
-  ;;   .store_ref(
-  ;;     begin_cell()
-  ;;       .store_uint(4, 8)
-  ;;       .end_cell()
-  ;;   )
-  ;;   .end_cell();
-
-
   int flen = ubitsize(flag);
   int vlen = ubitsize(value);
 
@@ -148,9 +126,6 @@ slice int_to_slice(int bits, int size) {
   slice sc = linked_list.begin_parse();
   
   while (~ sc.slice_empty?()) {
-    
-    ;; iter slice
-    ;; 
     (_, (int bits, int len)) = preload(sc, flen);
 
     if (len > 0) {
@@ -159,16 +134,9 @@ slice int_to_slice(int bits, int size) {
       if (bits == flag) {
         (int bits, _) = sc~preload(flen);
         (new_out, has_new) = out~write_bits(int_to_slice(value, vlen), vlen);
-
-        ;; ~strdump("==");
-        ;; ~dump(bits);
-        ;; ~dump(out);
       } else {
         (int bits, _) = sc~preload(1);
         (new_out, has_new) = out~write_bits(int_to_slice(bits, 1), 1);
-        ;; ~strdump("!!");
-        ;; ~dump(bits);
-        ;; ~dump(out);
       }
 
       if (has_new) {
@@ -178,8 +146,6 @@ slice int_to_slice(int bits, int size) {
     }
   }
 
-  ;; take root cell from stack
-
   while (out_stack.tlen() > 0) {
     builder top = out_stack~pop_back();
     top = store_ref(top, out.end_cell());
@@ -187,14 +153,9 @@ slice int_to_slice(int bits, int size) {
   }
 
   if (out_stack.tlen() == 0) {
-    cell c = out.end_cell();
-    ;; sc = c.begin_parse();
-    ;; ~dump(sc~load_uint(sc.slice_bits()));
-
-    return c;
+    return out.end_cell();
   }
 
-  ;; ~dump(6);
   return out_stack~pop_back().end_cell();
 }
 
