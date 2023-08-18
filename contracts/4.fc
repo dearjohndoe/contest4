@@ -7,8 +7,7 @@
 -}
 
 (int) tlen(tuple t) asm "TLEN";
-forall X -> (tuple, ()) push_back(tuple tail, X head) asm "CONS";
-forall X -> (tuple, (X)) pop_back(tuple t) asm "UNCONS";
+forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
 
 global int Shift;
 
@@ -43,13 +42,12 @@ cell do_ceasar(int first_symbol, cell text) {
 
   ;; check tail
   if (~ sc.slice_refs_empty?()) {
-    out_stack.push_back(out);
+    out_stack~tpush(out);
     sc = sc~load_ref().begin_parse();
   }
 
-
   while (out_stack.tlen() > 0) {
-    out = out_stack~pop_back().store_ref(out.end_cell());
+    out = out_stack~tpop().store_ref(out.end_cell());
   }
 
   return out.end_cell();
