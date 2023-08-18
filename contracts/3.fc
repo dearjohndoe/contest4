@@ -124,10 +124,9 @@ int preload(slice sc, int read) inline {
   tuple out_stack = empty_tuple();
   var out = begin_cell();
   slice sc = linked_list.begin_parse();
-  int bits = 0;
 
   while (~ sc.slice_empty?()) {
-    bits = preload(sc, flen);
+    int bits = preload(sc, flen);
 
     builder new_out = null();
     if (bits == flag) {
