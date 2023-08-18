@@ -32,6 +32,8 @@
 
 global int FLen;
 
+global int FLen;
+
 int min(int x, int y) asm "MIN";
 (int) ubitsize(int a) asm "UBITSIZE";
 
@@ -81,7 +83,7 @@ int preload(slice sc) inline {
     ;; load tail
     sc = sc~load_ref().begin_parse();
     int tail_len = FLen - read_bits;
-    int tail = sc~load_uint(min(tail_len, sc.slice_bits()));
+    int tail = sc~load_uint(tail_len);
 
     bits = (bits << tail_len) + tail;
   }
