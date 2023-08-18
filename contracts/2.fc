@@ -10,13 +10,14 @@
 -}
 
 (int) tlen(tuple t) asm "TLEN";
+forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
 
 ;; testable
 (tuple) matrix_multiplier(tuple matrixA, tuple matrixB) method_id {
   int n = tlen(matrixA);
-  tuple matrixAAtI = matrixA.first();
+  tuple matrixAAtI = matrixA~tpop();
   int m = tlen(matrixAAtI);
-  int p = tlen(matrixAAtI);
+  int p = tlen(matrixB.first());
   int j = 0;
   int i = 0;
   int sum = 0;
