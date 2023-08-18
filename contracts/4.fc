@@ -38,8 +38,7 @@ cell do_ceasar(int first_symbol, cell text) {
 
   ;; check tail
   if (~ sc.slice_refs_empty?()) {
-    cell tail = do_ceasar(0, sc~load_ref());
-    encrypted = store_ref(encrypted, tail);
+    encrypted = store_ref(encrypted, do_ceasar(0, sc~load_ref()));
   }
 
   return encrypted.end_cell();

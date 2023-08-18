@@ -64,8 +64,7 @@ forall X -> (tuple, (X)) pop_back(tuple t) asm "UNCONS";
 
   ;; switch to next ref
   if (left_bits == 0) {
-    cell tail = sc~load_ref();
-    sc = tail.begin_parse();
+    sc = sc~load_ref().begin_parse();
     left_bits = sc.slice_bits();
   }
 
@@ -79,8 +78,7 @@ forall X -> (tuple, (X)) pop_back(tuple t) asm "UNCONS";
     }
 
     ;; load tail
-    cell child = sc~load_ref();
-    sc = child.begin_parse();
+    sc = sc~load_ref().begin_parse();
     (int tail, int tail_len) = sc~preload(read - read_bits);
 
     if (tail_len != -1) {

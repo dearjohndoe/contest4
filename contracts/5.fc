@@ -38,7 +38,7 @@
     }
   }
 
-  ;; compute first element
+  ;; compute first elements
   int prev = 0;
   int current = 1;
   int temp = 0;
