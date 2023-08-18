@@ -6,9 +6,6 @@
   character should go to the beginning. Return new text encoded in cell.
 -}
 
-(int) tlen(tuple t) asm "TLEN";
-forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
-
 global int Shift;
 
 () recv_internal() {
@@ -26,31 +23,24 @@ int crypt_char(int c) {
 }
 
 cell do_ceasar(int first_symbol, cell text) {
-  tuple out_stack = empty_tuple();
-  var out = begin_cell();
+  var encrypted = begin_cell();
   slice sc = text.begin_parse();
 
   if (first_symbol == -1) {
-    sc~load_uint(32);
-    out~store_uint(0, 32);
+    encrypted~store_uint(sc~load_uint(32), 32);
   }
 
   ;; do base encrypt
   while (~ sc.slice_data_empty?()) {
-    out~store_uint(crypt_char(sc~load_uint(8)), 8);
+    encrypted~store_uint(crypt_char(sc~load_uint(8)), 8);
   }
 
   ;; check tail
   if (~ sc.slice_refs_empty?()) {
-    out_stack~tpush(out);
-    sc = sc~load_ref().begin_parse();
+    encrypted = store_ref(encrypted, do_ceasar(0, sc~load_ref()));
   }
 
-  while (out_stack.tlen() > 0) {
-    out = out_stack~tpop().store_ref(out.end_cell());
-  }
-
-  return out.end_cell();
+  return encrypted.end_cell();
 }
 
 ;; testable
