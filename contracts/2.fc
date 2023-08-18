@@ -15,7 +15,7 @@ forall X -> (tuple, X) ~tpop (tuple t) asm "TPOP";
 ;; testable
 (tuple) matrix_multiplier(tuple matrixA, tuple matrixB) method_id {
   int n = tlen(matrixA);
-  tuple matrixAAtI = matrixA~tpop();
+  tuple matrixAAtI = matrixA.first();
   int m = tlen(matrixAAtI);
   int p = tlen(matrixB.first());
   int j = 0;
