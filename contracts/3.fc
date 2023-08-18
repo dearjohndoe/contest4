@@ -134,7 +134,7 @@ int preload(slice sc, int read) inline {
       sc~load(flen);
       (new_out, has_new) = out~write_bits(value, vlen);
     } else {
-      bits = sc~load(1);
+      bits = sc~load_uint(1);
       (new_out, has_new) = out~write_bits(bits, 1);
     }
 
