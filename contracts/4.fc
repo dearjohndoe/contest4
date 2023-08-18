@@ -33,7 +33,7 @@ cell do_ceasar(int shift, int first_symbol, cell text) {
 
   while (~ sc.slice_empty?()) {
     ;; do base encrypt
-    while (~ sc.slice_data_empty?()) {
+    while (sc.slice_bits() >= 8) {
       out~store_uint(crypt_char(shift, sc~load_uint(8)), 8);
     }
 
