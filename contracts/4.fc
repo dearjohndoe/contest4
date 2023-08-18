@@ -6,10 +6,11 @@
   character should go to the beginning. Return new text encoded in cell.
 -}
 
-() recv_internal() {
-}
+(int) tlen(tuple t) asm "TLEN";
+forall X -> (tuple, ()) push_back(tuple tail, X head) asm "CONS";
+forall X -> (tuple, (X)) pop_back(tuple t) asm "UNCONS";
 
-int crypt_char(int s, int c) {
+int crypt_char(int s, int c) inline {
   if ((c >= 65) & (c <= 90)) {
     return 65 + (c - 65 + s) % 26;
   }
@@ -21,26 +22,38 @@ int crypt_char(int s, int c) {
 }
 
 cell do_ceasar(int shift, int first_symbol, cell text) {
-  var encrypted = begin_cell();
+  tuple out_stack = empty_tuple();
+  builder out = begin_cell();
   slice sc = text.begin_parse();
 
   if (first_symbol == -1) {
     sc~load_uint(32);
-    encrypted~store_uint(0, 32);
+    out~store_uint(0, 32);
   }
 
-  ;; do base encrypt
-  while (sc.slice_bits() >= 8) {
-    encrypted~store_uint(crypt_char(shift, sc~load_uint(8)), 8);
+  while (~ sc.slice_empty?()) {
+    ;; do base encrypt
+    while (~ sc.slice_data_empty?()) {
+      out~store_uint(crypt_char(shift, sc~load_uint(8)), 8);
+    }
+
+    ;; check tail
+    if (~ sc.slice_refs_empty?()) {
+      out_stack~push_back(out);
+      sc = sc~load_ref().begin_parse();
+    }
   }
 
-  ;; check tail
-  if (~ sc.slice_refs_empty?()) {
-    cell tail = do_ceasar(shift, 0, sc~load_ref());
-    encrypted = store_ref(encrypted, tail);
+  while (out_stack.tlen() > 0) {
+    builder top = out_stack~pop_back();
+    top = store_ref(top, out.end_cell());
+    out = top;
   }
 
-  return encrypted.end_cell();
+  return out.end_cell();
+}
+
+() recv_internal() {
 }
 
 ;; testable
