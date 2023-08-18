@@ -82,11 +82,7 @@ forall X -> (tuple, (X)) pop_back(tuple t) asm "UNCONS";
     int tail_len = read - read_bits;
     int tail = sc~preload(tail_len);
 
-    ~dump(0);
-    ~dump(tail_len);
-    bits = bits << tail_len;
-    bits += tail;
-    read_bits += tail_len;
+    bits = (bits << tail_len) + tail;
   }
 
   return (sc, (bits));
