@@ -99,6 +99,10 @@ int preload(slice sc, int read) inline {
   ;; load from current
   int read_bits = min(left_bits, read);
   int bits = sc~load_uint(read_bits);
+  if (left_bits == read) {
+    return (sc~load_ref().begin_parse(), (bits));
+  }
+
   if (left_bits < read) {
     ;; no cells anymore
     if (sc.slice_refs_empty?()) {
