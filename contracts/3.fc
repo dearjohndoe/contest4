@@ -40,12 +40,12 @@ forall X -> (tuple, (X)) pop_back(tuple t) asm "UNCONS";
 () recv_internal() {
 }
 
-(builder, (builder, int)) write_bits(builder out, int v, int s) {
+(builder, (builder)) write_bits(builder out, int v, int s) {
   int limit = 1023 - out.builder_bits();
   if (s < limit) {
     out~store_uint(v, s);
 
-    return (out, (null(), 0));
+    return (out, (begin_cell()));
   }
 
   out~store_uint(v >> s - limit, limit);
@@ -56,7 +56,7 @@ forall X -> (tuple, (X)) pop_back(tuple t) asm "UNCONS";
     next_cell~store_uint(v & mask, s - limit);
   }
 
-  return (out, (next_cell, -1));
+  return (out, (next_cell));
 }
 
 int preload(slice sc, int read) inline {
@@ -99,10 +99,6 @@ int preload(slice sc, int read) inline {
   ;; load from current
   int read_bits = min(left_bits, read);
   int bits = sc~load_uint(read_bits);
-  if (left_bits == read) {
-    return (sc~load_ref().begin_parse(), (bits));
-  }
-
   if (left_bits < read) {
     ;; no cells anymore
     if (sc.slice_refs_empty?()) {
@@ -133,16 +129,15 @@ int preload(slice sc, int read) inline {
     int bits = preload(sc, flen);
 
     builder new_out = null();
-    int has_new = 0;
     if (bits == flag) {
       sc~load(flen);
-      (new_out, has_new) = out~write_bits(value, vlen);
+      new_out = out~write_bits(value, vlen);
     } else {
-      bits = sc~load_uint(1);
-      (new_out, has_new) = out~write_bits(bits, 1);
+      bits = sc~load(1);
+      new_out = out~write_bits(bits, 1);
     }
 
-    if (has_new) {
+    if (new_out.builder_bits()) {
       out_stack~push_back(out);
       out = new_out;
     }
