@@ -83,7 +83,7 @@ int preload(slice sc) inline {
     ;; load tail
     sc = sc~load_ref().begin_parse();
     int tail_len = FLen - read_bits;
-    int tail = sc~load_uint(tail_len);
+    int tail = sc~load_uint(min(tail_len, sc.slice_bits()));
 
     bits = (bits << tail_len) + tail;
   }
@@ -112,7 +112,7 @@ int preload(slice sc) inline {
     ;; load tail
     sc = sc~load_ref().begin_parse();
     int tail_len = read - read_bits;
-    int tail = sc~load(min(tail_len, sc.slice_bits()));
+    int tail = sc~load(tail_len);
 
     bits = (bits << tail_len) + tail;
   }
