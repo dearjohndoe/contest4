@@ -41,26 +41,20 @@ forall X -> (tuple, (X)) pop_back(tuple t) asm "UNCONS";
 () recv_internal() {
 }
 
-slice int_to_slice(int bits, int size) {
-  return begin_cell()
-    .store_uint(bits, size)
-    .end_cell()
-    .begin_parse();
-}
-
-(builder, (builder, int)) write_bits(builder out, slice v, int s) {
+(builder, (builder, int)) write_bits(builder out, int v, int s) {
   int limit = 1023 - out.builder_bits();
   if (s < limit) {
-    out~store_uint(v~load_uint(v.slice_bits()), s);
+    out~store_uint(v, s);
 
     return (out, (null(), 0));
   }
 
-  out~store_uint(v~load_uint(limit), limit);
+  out~store_uint(v >> s - limit, limit);
 
   builder next_cell = begin_cell();
   if (s > limit) {
-    next_cell~store_uint(v~load_uint(v.slice_bits()), s - limit);
+    int mask = (1 << s - limit) - 1;
+    next_cell~store_uint(v & mask, s - limit);
   }
 
   return (out, (next_cell, -1));
@@ -133,10 +127,10 @@ slice int_to_slice(int bits, int size) {
       int has_new = 0;
       if (bits == flag) {
         (int bits, _) = sc~preload(flen);
-        (new_out, has_new) = out~write_bits(int_to_slice(value, vlen), vlen);
+        (new_out, has_new) = out~write_bits(value, vlen);
       } else {
         (int bits, _) = sc~preload(1);
-        (new_out, has_new) = out~write_bits(int_to_slice(bits, 1), 1);
+        (new_out, has_new) = out~write_bits(bits, 1);
       }
 
       if (has_new) {
